@@ -17,8 +17,15 @@ HOST = "127.0.0.1"
 PORT = 8765
 
 sys.path.insert(0, str(YTP_DIR))
-from ytp import download  # noqa: E402
-from yt_dlp.utils import DownloadError, YoutubeDLError  # noqa: E402
+try:
+    from ytp import download  # noqa: E402
+    from yt_dlp.utils import DownloadError, YoutubeDLError  # noqa: E402
+except ModuleNotFoundError as exc:  # pragma: no cover - startup guard
+    if exc.name in {"yt_dlp", "ytp"}:
+        raise SystemExit(
+            "Missing required dependency. Install it with: python -m pip install yt-dlp"
+        ) from exc
+    raise
 
 _download_lock = threading.Lock()
 
@@ -115,7 +122,7 @@ class Handler(SimpleHTTPRequestHandler):
 def main() -> int:
     DOWNLOAD_DIR.mkdir(parents=True, exist_ok=True)
     server = ThreadingHTTPServer((HOST, PORT), Handler)
-    print(f"Open http://{HOST}:{PORT}/yt.html", flush=True)
+    print(f"Open http://{HOST}:{PORT}/index.html", flush=True)
     print(f"Downloads folder: {DOWNLOAD_DIR}", flush=True)
     print("Leave this window open while you use the page. Press Ctrl+C to stop.", flush=True)
     try:

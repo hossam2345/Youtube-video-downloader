@@ -216,7 +216,7 @@
     <button id="paste" onclick="paste()">Paste <i class="fa-solid fa-paste"></i></button>
     <button id="open" class="secondary" disabled>Open in YouTube <i class="fa-solid fa-arrow-up-right-from-square"></i></button>
     <button id="watch" class="secondary" disabled>Watch here <i class="fa-solid fa-play"></i></button>
-    <button id="download">Download <i class="fa-solid fa-download"></i></button>
+    <button id="download" disabled>Download <i class="fa-solid fa-download"></i></button>
   </div>
 
   <label class="options">
@@ -339,6 +339,7 @@
 
       openBtn.disabled = false;
       watchBtn.disabled = false;
+      downloadBtn.disabled = false;
       openBtn.onclick = () => window.open(raw, '_blank', 'noopener,noreferrer');
 
       // Use the HTML snippet from oEmbed for a safe embed.
