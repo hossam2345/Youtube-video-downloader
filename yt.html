@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YT Vid Downloader</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      min-height: 100dvh;
+      height: auto;
+      gap: 13px;
+      padding: 16px 16px 32px;
+    }
+
+    h1 {
+      color: transparent;
+      background-clip: text;
+      background: linear-gradient(45deg, red, orange);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-size: 2rem;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 20px;
+      letter-spacing: 1px;
+    }
+
+    span {
+      font-size: 1.2rem;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 10px;
+      letter-spacing: 1px;
+      color: #000000;
+      background-color: #ffffff;
+    }
+
+    .input-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0px;
+      flex-wrap: wrap;
+    }
+
+    input {
+      width: min(400px, 400px);
+      padding: 10px 5px;
+      border: red 2px solid;
+      border-end-start-radius: 5px;
+      border-start-start-radius: 5px;
+      box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    button {
+      width: 120px;
+      padding: 10px 5px;
+      border-start-end-radius: 5px;
+      border-end-end-radius: 5px;
+      border: 2px solid red;
+      background-color: red;
+      transition: all 0.3s ease;
+      cursor: pointer;
+
+    }
+
+    button:hover {
+      transform: scale(1.03);
+      transition: all 0.5s ease;
+      letter-spacing: 2px;
+    }
+
+    button#paste {
+      border-radius: 5px;
+      color:black;
+      border: 2px solid red;
+      background-color: red;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .secondary {
+      border-color: #111;
+      background: #fff;
+      color: #111;
+    }
+
+    .card {
+      width: min(720px, 100%);
+      border: 1px solid rgba(0,0,0,0.12);
+      border-radius: 12px;
+      padding: 12px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+      display: none;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .thumb {
+      width: 160px;
+      height: 90px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 1px solid rgba(0,0,0,0.08);
+      flex: 0 0 auto;
+    }
+
+    .meta {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .title {
+      font-weight: 700;
+      font-size: 1rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .byline {
+      color: rgba(0,0,0,0.7);
+      font-size: 0.95rem;
+    }
+
+    .error {
+      color: #b00020;
+      font-weight: 600;
+      display: none;
+      text-align: center;
+      max-width: 70ch;
+    }
+
+    .player {
+      width: min(720px, 100%);
+      aspect-ratio: 16 / 9;
+      border-radius: 12px;
+      border: 1px solid rgba(0,0,0,0.12);
+      display: none;
+    }
+
+    button#download {
+      color: #fff;
+      font-weight: 700;
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .options {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+    }
+
+    .options input {
+      width: auto;
+      box-shadow: none;
+      border: none;
+    }
+
+    .status {
+      max-width: 70ch;
+      text-align: center;
+      font-weight: 600;
+      display: none;
+    }
+
+    .server-note {
+      font-size: 0.9rem;
+      color: rgba(0,0,0,0.7);
+      text-align: center;
+      max-width: 70ch;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>YouTube Video Downloader</h1>
+  <span>YouTube URL:</span>
+  <div class="input-container">
+
+    <input type="text" id="url" placeholder="Enter URL" />
+    <button id="fetchInfo">Fetch info <i class="fa-solid fa-magnifying-glass"></i></button>
+  </div>
+
+  <div class="actions">
+    <button id="paste" onclick="paste()">Paste <i class="fa-solid fa-paste"></i></button>
+    <button id="open" class="secondary" disabled>Open in YouTube <i class="fa-solid fa-arrow-up-right-from-square"></i></button>
+    <button id="watch" class="secondary" disabled>Watch here <i class="fa-solid fa-play"></i></button>
+    <button id="download">Download <i class="fa-solid fa-download"></i></button>
+  </div>
+
+  <label class="options">
+    <input type="checkbox" id="audioOnly" />
+    Audio only
+  </label>
+
+  <p id="serverNote" class="server-note">Checking local downloader server…</p>
+  <div id="status" class="status"></div>
+  <div id="error" class="error"></div>
+
+  <div id="card" class="card">
+    <img id="thumb" class="thumb" alt="Video thumbnail" />
+    <div class="meta">
+      <div id="title" class="title"></div>
+      <div id="byline" class="byline"></div>
+    </div>
+  </div>
+
+  <iframe
+    id="player"
+    class="player"
+    title="YouTube player"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    allowfullscreen
+  ></iframe>
+</body>
+<script>
+  const API_BASE = (location.protocol === 'file:') ? 'http://127.0.0.1:8765' : '';
+  const urlInput = document.getElementById('url');
+  const errorEl = document.getElementById('error');
+  const statusEl = document.getElementById('status');
+  const serverNoteEl = document.getElementById('serverNote');
+  const cardEl = document.getElementById('card');
+  const thumbEl = document.getElementById('thumb');
+  const titleEl = document.getElementById('title');
+  const bylineEl = document.getElementById('byline');
+  const openBtn = document.getElementById('open');
+  const watchBtn = document.getElementById('watch');
+  const downloadBtn = document.getElementById('download');
+  const audioOnlyEl = document.getElementById('audioOnly');
+  const playerEl = document.getElementById('player');
+  const fetchInfoBtn = document.getElementById('fetchInfo');
+
+  function setError(message) {
+    if (!message) {
+      errorEl.style.display = 'none';
+      errorEl.textContent = '';
+      return;
+    }
+    errorEl.textContent = message;
+    errorEl.style.display = 'block';
+  }
+
+  function isLikelyYouTubeUrl(raw) {
+    try {
+      const u = new URL(raw);
+      return (
+        u.hostname === 'youtu.be' ||
+        u.hostname.endsWith('youtube.com') ||
+        u.hostname.endsWith('youtube-nocookie.com')
+      );
+    } catch {
+      return false;
+    }
+  }
+
+  function setStatus(message) {
+    if (!message) {
+      statusEl.style.display = 'none';
+      statusEl.textContent = '';
+      return;
+    }
+    statusEl.textContent = message;
+    statusEl.style.display = 'block';
+  }
+
+  function resetUI() {
+    setError('');
+    setStatus('');
+    cardEl.style.display = 'none';
+    playerEl.style.display = 'none';
+    playerEl.src = '';
+    openBtn.disabled = true;
+    watchBtn.disabled = true;
+  }
+
+  async function paste(){
+    const text = await navigator.clipboard.readText();
+    urlInput.value = text;
+    resetUI();
+  }
+
+  async function fetchInfo() {
+    resetUI();
+    const raw = urlInput.value.trim();
+
+    if (!raw) {
+      setError('Paste a YouTube URL first.');
+      return;
+    }
+
+    if (!isLikelyYouTubeUrl(raw)) {
+      setError('That doesn’t look like a YouTube URL. This page only fetches info for YouTube links.');
+      return;
+    }
+
+    try {
+      // Public oEmbed endpoint (no API key). Returns title/author/thumbnail + HTML embed snippet.
+      const endpoint = `https://www.youtube.com/oembed?format=json&url=${encodeURIComponent(raw)}`;
+      const res = await fetch(endpoint);
+      if (!res.ok) throw new Error(`oEmbed request failed (${res.status})`);
+
+      const data = await res.json();
+
+      thumbEl.src = data.thumbnail_url || '';
+      titleEl.textContent = data.title || 'Unknown title';
+      bylineEl.textContent = data.author_name ? `By ${data.author_name}` : '';
+      cardEl.style.display = 'flex';
+
+      openBtn.disabled = false;
+      watchBtn.disabled = false;
+      openBtn.onclick = () => window.open(raw, '_blank', 'noopener,noreferrer');
+
+      // Use the HTML snippet from oEmbed for a safe embed.
+      const temp = document.createElement('div');
+      temp.innerHTML = data.html || '';
+      const iframe = temp.querySelector('iframe');
+      const src = iframe?.getAttribute('src');
+      watchBtn.onclick = () => {
+        if (!src) {
+          setError('Could not build an embed player for this link.');
+          return;
+        }
+        playerEl.src = src;
+        playerEl.style.display = 'block';
+      };
+    } catch (e) {
+      setError(`Couldn’t fetch info. Try a different link. (${e?.message || 'unknown error'})`);
+    }
+  }
+
+  async function checkServer() {
+    try {
+      const res = await fetch(`${API_BASE}/api/health`);
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error('not ok');
+      serverNoteEl.textContent = `Local server connected. Files save to: ${data.downloads}`;
+    } catch {
+      serverNoteEl.textContent =
+        'Local server is not running. Double-click start-server.bat (or run server.py), then refresh this page.';
+    }
+  }
+
+  async function downloadVideo() {
+    setError('');
+    const raw = urlInput.value.trim();
+
+    if (!raw) {
+      setError('Paste a YouTube URL first.');
+      return;
+    }
+
+    if (!isLikelyYouTubeUrl(raw)) {
+      setError('That doesn’t look like a YouTube URL.');
+      return;
+    }
+
+    downloadBtn.disabled = true;
+    setStatus(audioOnlyEl.checked ? 'Downloading audio… this can take a minute.' : 'Downloading video… this can take a minute.');
+
+    try {
+      const res = await fetch(`${API_BASE}/api/download`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          url: raw,
+          audio_only: audioOnlyEl.checked,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.ok) {
+        throw new Error(data.error || `Download request failed (${res.status})`);
+      }
+      setStatus(`Saved: ${data.path}`);
+    } catch (e) {
+      const msg = e?.message || 'unknown error';
+      if (msg === 'Failed to fetch' || msg.includes('NetworkError')) {
+        setError('Couldn’t reach the local server. Start start-server.bat and keep that window open.');
+      } else {
+        setError(`Download failed. (${msg})`);
+      }
+      setStatus('');
+    } finally {
+      downloadBtn.disabled = false;
+    }
+  }
+
+  fetchInfoBtn.addEventListener('click', fetchInfo);
+  downloadBtn.addEventListener('click', downloadVideo);
+  urlInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') fetchInfo();
+  });
+  checkServer();
+
+</script>
+</html>
